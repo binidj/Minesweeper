@@ -8,25 +8,30 @@ void Game::initVariables()
 
 void Game::initWindow()
 {
-    window = std::make_unique<sf::RenderWindow>(videoMode, "SFML works!");
+    window = std::make_unique<sf::RenderWindow>(videoMode, "Minesweeper!");
+    gameEntities = std::list<std::unique_ptr<IGameEntity>>();
 }
 
 void Game::pollEvents()
 {
-    while (window->pollEvent(event))
+    while (window->pollEvent(currentEvent))
     {
-        switch (event.type)
+        switch (currentEvent.type)
         {
             case sf::Event::Closed:
                 window->close();
                 break;
 
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape)
+                if (currentEvent.key.code == sf::Keyboard::Escape)
                     window->close();
                 break;
 
             default:
+                for (auto& entity : gameEntities)
+                {
+                    entity->HandleEvent(currentEvent);
+                }
                 break;
         }            
     }
@@ -46,19 +51,24 @@ Game::~Game()
 void Game::update()
 {
     pollEvents();
-
 }
 
 void Game::render()
 {
     window->clear();
     
-    // draw objects
+    for (auto& entity : gameEntities)
+    {
+        entity->Draw(window);
+    }
 
     window->display();
 }
 
-
+void Game::attachEntity(std::unique_ptr<IGameEntity>& entity)
+{
+    gameEntities.push_back(std::move(entity));
+}
 
 const bool Game::isRunning() const
 {
