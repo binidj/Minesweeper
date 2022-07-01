@@ -9,6 +9,7 @@ void Game::initVariables()
 void Game::initWindow()
 {
     window = std::make_unique<sf::RenderWindow>(videoMode, "Minesweeper!");
+    window->setFramerateLimit(FRAME_RATE_LIMIT);
     gameEntities = std::list<std::unique_ptr<IGameEntity>>();
 }
 
@@ -30,7 +31,7 @@ void Game::pollEvents()
             default:
                 for (auto& entity : gameEntities)
                 {
-                    entity->HandleEvent(currentEvent);
+                    entity->handleEvent(currentEvent);
                 }
                 break;
         }            
@@ -59,7 +60,7 @@ void Game::render()
     
     for (auto& entity : gameEntities)
     {
-        entity->Draw(window);
+        entity->draw(window);
     }
 
     window->display();

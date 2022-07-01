@@ -1,8 +1,16 @@
 #pragma once
 
 #include "IGameEntity.h"
+#include "CellType.h"
 
-class Cell : public IGameEntity
+struct Cell
 {
+	CellType cellState;
+	CellType cellRenderMode;
+	sf::Sprite sprite;
+	bool hasBanner;
+	bool isRevealed;
+	Cell();
+	void setSpriteTexture(const sf::Texture& texture);
 };
 

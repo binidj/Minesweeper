@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <list>
 #include "IGameEntity.h"
+#include "Constants.h"
 
 class Game
 {
