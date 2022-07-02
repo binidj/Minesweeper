@@ -1,6 +1,6 @@
 #include "Cell.h"
 
-Cell::Cell() : cellState(CellType::empty), cellRenderMode(CellType::empty), hasBanner(false), isRevealed(false)
+Cell::Cell() : cellState(CellType::empty), cellRenderMode(CellType::unrevealed), hasBanner(false), isRevealed(false)
 {
 }
 
