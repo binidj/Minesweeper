@@ -8,7 +8,7 @@ void Game::initVariables()
 
 void Game::initWindow()
 {
-    window = std::make_unique<sf::RenderWindow>(videoMode, "Minesweeper");
+    window = std::make_unique<sf::RenderWindow>(videoMode, "Minesweeper", sf::Style::Close);
     window->setFramerateLimit(FRAME_RATE_LIMIT);
     gameEntities = std::list<std::unique_ptr<IGameEntity>>();
 }
