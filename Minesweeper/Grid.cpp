@@ -1,29 +1,34 @@
 #include "Grid.h"
 #include <iostream>
 
-Grid::Grid(std::unordered_map<CellType, sf::Texture>& gridTextures) : gridTextures(gridTextures)
-{
+Grid::Grid(std::unordered_map<CellType, sf::Texture>& gridTextures) : 
+	gridTextures(gridTextures), listeningInput(true), unrevealedCells((MAX_GRID_COLLUMS * MAX_GRID_ROWS) - BOMBS_AMOUNT)
+{	
+	initGridPosition();
+	
 	initCellStates();
 
 	initCellTextures();
 }
 
-void Grid::initCellTextures()
+void Grid::initGridPosition()
 {
 	lowerAnchorPoint.x = 65.f;
 	lowerAnchorPoint.y = 65.f;
 
 	upperAnchorPoint.x = lowerAnchorPoint.x + static_cast<float>(CELL_SIZE * MAX_GRID_COLLUMS);
 	upperAnchorPoint.y = lowerAnchorPoint.y + static_cast<float>(CELL_SIZE * MAX_GRID_ROWS);
+}
 
+void Grid::initCellTextures()
+{
 	for (int i = 0; i < MAX_GRID_COLLUMS; i++)
 	{
 		for (int j = 0; j < MAX_GRID_ROWS; j++)
 		{
 			sf::Vector2f pos(lowerAnchorPoint.x + static_cast<float>(CELL_SIZE * i), lowerAnchorPoint.y + static_cast<float>(CELL_SIZE * j));
 			grid[i][j].sprite.setPosition(pos);
-			sf::Texture& texture = gridTextures[grid[i][j].cellRenderMode];
-			grid[i][j].setSpriteTexture(texture);
+			applyTexture(grid[i][j]);
 		}
 	}
 }
@@ -72,12 +77,104 @@ void Grid::setSurroudingBombs()
 	}
 }
 
-void Grid::revealCell()
+void Grid::applyTexture(Cell& cell)
 {
+	sf::Texture& texture = gridTextures[cell.cellRenderMode];
+	cell.setSpriteTexture(texture);
 }
 
-void Grid::placeBanner()
+void Grid::propagateReveal(int col, int row)
 {
+	Cell& cell = grid[col][row];
+
+	if (!isValidGridCell(col, row) || cell.isRevealed)
+		return;
+
+	unrevealedCells -= 1;
+	cell.cellRenderMode = cell.cellState;
+	cell.isRevealed = true;
+
+	applyTexture(cell);
+
+	if (cell.cellState == CellType::empty)
+	{
+		for (int i = 0; i < directions.size(); i++)
+		{
+			propagateReveal(col + directions[i].x, row + directions[i].y);
+		}
+	}
+}
+
+void Grid::revealCell()
+{
+	Cell& cell = grid[gridPosition.x][gridPosition.y];
+
+	if (cell.hasBanner)
+		return;
+
+	if (cell.cellState == CellType::bomb)
+	{
+		listeningInput = false;
+		std::cout << "Hit bomb" << "\n";
+		handleGameLost();
+		return;
+	}
+
+	propagateReveal(gridPosition.x, gridPosition.y);
+
+	if (unrevealedCells == 0)
+	{
+		listeningInput = false;
+		std::cout << "Game Won" << "\n";
+		handleGameWon();
+	}
+}
+
+void Grid::toggleBanner()
+{
+	Cell& cell = grid[gridPosition.x][gridPosition.y];
+
+	if (cell.isRevealed)
+		return;
+
+	cell.hasBanner = !cell.hasBanner;
+
+	if (cell.cellRenderMode == CellType::unrevealed)
+		cell.cellRenderMode = CellType::banner;
+	else if (cell.cellRenderMode == CellType::banner)
+		cell.cellRenderMode = CellType::unrevealed;
+
+	applyTexture(cell);
+}
+
+void Grid::handleGameLost()
+{
+	for (int i = 0; i < MAX_GRID_COLLUMS; i++)
+	{
+		for (int j = 0; j < MAX_GRID_ROWS; j++)
+		{
+			if (grid[i][j].cellState == CellType::bomb)
+			{
+				grid[i][j].cellRenderMode = CellType::bomb;
+				applyTexture(grid[i][j]);
+			}
+		}
+	}
+}
+
+void Grid::handleGameWon()
+{
+	for (int i = 0; i < MAX_GRID_COLLUMS; i++)
+	{
+		for (int j = 0; j < MAX_GRID_ROWS; j++)
+		{
+			if (grid[i][j].cellState == CellType::bomb)
+			{
+				grid[i][j].cellRenderMode = CellType::bombCross;
+				applyTexture(grid[i][j]);
+			}
+		}
+	}
 }
 
 sf::Vector2i Grid::calcGridPosition()
@@ -108,8 +205,12 @@ bool Grid::isValidGridCell(int col, int row)
 
 void Grid::handleEvent(sf::Event& event)
 {
+	
 	if (event.type == sf::Event::MouseButtonPressed)
 	{
+		if (!listeningInput)
+			return;
+		
 		mousePosition = sf::Vector2f(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y));
 
 		std::cout << mousePosition.x << " " << mousePosition.y << " Mouse pos\n";
@@ -125,7 +226,7 @@ void Grid::handleEvent(sf::Event& event)
 			revealCell();
 
 		if (event.mouseButton.button == sf::Mouse::Button::Right)
-			placeBanner();
+			toggleBanner();
 	}
 }
 

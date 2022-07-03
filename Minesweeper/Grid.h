@@ -15,15 +15,24 @@ private:
 	sf::Vector2i gridPosition;
 	Cell grid[MAX_GRID_COLLUMS][MAX_GRID_ROWS];
 	std::unordered_map<CellType, sf::Texture> &gridTextures;
+	int unrevealedCells;
+	bool listeningInput;
+
+	void initGridPosition();
 	void initCellTextures();
 	void setBombsCoordinates();
 	void initCellStates();
 	void setSurroudingBombs();
 	void revealCell();
-	void placeBanner();
+	void toggleBanner();
+	void handleGameLost();
+	void handleGameWon();
+	void applyTexture(Cell& cell);
+	void propagateReveal(int col, int row);
 	sf::Vector2i calcGridPosition();
 	bool mouseInsideGrid();
 	bool isValidGridCell(int col, int row);
+
 public:
 	Grid(std::unordered_map<CellType, sf::Texture>& gridTextures);
 	void handleEvent(sf::Event& event);

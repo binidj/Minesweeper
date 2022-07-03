@@ -11,4 +11,4 @@ static const std::vector<sf::Vector2i> directions = {
 
 // Game
 static const int FRAME_RATE_LIMIT = 60;
-static const int BOMBS_AMOUNT = 25;
+static const int BOMBS_AMOUNT = 20;
