@@ -3,12 +3,12 @@
 void Game::initVariables()
 {
     window = nullptr;
-    videoMode = sf::VideoMode(512, 512);
+    videoMode = sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void Game::initWindow()
 {
-    window = std::make_unique<sf::RenderWindow>(videoMode, "Minesweeper!");
+    window = std::make_unique<sf::RenderWindow>(videoMode, "Minesweeper");
     window->setFramerateLimit(FRAME_RATE_LIMIT);
     gameEntities = std::list<std::unique_ptr<IGameEntity>>();
 }

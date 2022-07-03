@@ -35,6 +35,7 @@ private:
 
 public:
 	Grid(std::unordered_map<CellType, sf::Texture>& gridTextures);
+	void resetGrid();
 	void handleEvent(sf::Event& event);
 	void draw(std::unique_ptr<sf::RenderWindow>& window);
 };

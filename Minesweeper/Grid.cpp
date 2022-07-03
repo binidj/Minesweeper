@@ -1,11 +1,18 @@
 #include "Grid.h"
 #include <iostream>
 
-Grid::Grid(std::unordered_map<CellType, sf::Texture>& gridTextures) : 
-	gridTextures(gridTextures), listeningInput(true), unrevealedCells((MAX_GRID_COLLUMS * MAX_GRID_ROWS) - BOMBS_AMOUNT)
+Grid::Grid(std::unordered_map<CellType, sf::Texture>& gridTextures) : gridTextures(gridTextures)
 {	
+	resetGrid();
+}
+
+void Grid::resetGrid() 
+{
+	listeningInput = true;
+	unrevealedCells = (MAX_GRID_COLLUMS * MAX_GRID_ROWS) - BOMBS_AMOUNT;
+
 	initGridPosition();
-	
+
 	initCellStates();
 
 	initCellTextures();

@@ -10,5 +10,7 @@ static const std::vector<sf::Vector2i> directions = {
 };
 
 // Game
+static const int SCREEN_WIDTH = 512;
+static const int SCREEN_HEIGHT = 512;
 static const int FRAME_RATE_LIMIT = 60;
 static const int BOMBS_AMOUNT = 20;
