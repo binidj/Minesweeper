@@ -1,5 +1,5 @@
 # Minesweeper
-![Alt text](image.jpg?raw=true "Meme")
+![Alt text](image.JPG)
 
 A simple minesweeper made with SFML.
 
