@@ -9,8 +9,10 @@ int main()
 {
     FreeConsole();
     
+    // Maps a CellType to its respective texture
     std::unordered_map<CellType, sf::Texture> gridTextures;
 
+    // Texture loading
     for (int i = CellType::empty; i <= CellType::bombCross; i++)
     {
         sf::Texture texture;
@@ -18,6 +20,8 @@ int main()
         gridTextures[static_cast<CellType>(i)] = texture;
     }
     
+    // Game entities creation and attachment to the main game object
+
     Game game;
     
     std::unique_ptr<IGameEntity> grid = std::make_unique<Grid>(gridTextures, sf::Vector2f(65.f, 90.f));
@@ -32,7 +36,8 @@ int main()
     game.attachEntity(resetButton);
 
     game.attachEntity(grid);
-
+    
+    // Game loop
     while (game.isRunning())
     {
         game.update();

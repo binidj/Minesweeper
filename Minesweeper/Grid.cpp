@@ -1,6 +1,6 @@
 #include "Grid.h"
 
-Grid::Grid(std::unordered_map<CellType, sf::Texture>& gridTextures, sf::Vector2f lowerAnchorPoint) : 
+Grid::Grid(std::unordered_map<CellType, sf::Texture>& gridTextures, const sf::Vector2f& lowerAnchorPoint) : 
 	gridTextures(gridTextures), lowerAnchorPoint(lowerAnchorPoint)
 {	
 	resetGrid();
@@ -13,14 +13,14 @@ void Grid::resetGrid()
 
 	resetCells();
 	
-	initGridPosition();
+	fixUpperAnchorPoint();
 
 	initCellStates();
 
 	initCellTextures();
 }
 
-void Grid::initGridPosition()
+void Grid::fixUpperAnchorPoint()
 {
 	upperAnchorPoint.x = lowerAnchorPoint.x + static_cast<float>(CELL_SIZE * MAX_GRID_COLLUMS);
 	upperAnchorPoint.y = lowerAnchorPoint.y + static_cast<float>(CELL_SIZE * MAX_GRID_ROWS);

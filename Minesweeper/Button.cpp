@@ -6,7 +6,7 @@ bool Button::mouseInsideButton(const sf::Vector2f &mousePosition)
 			mousePosition.x <= upperAnchorPoint.x && mousePosition.y <= upperAnchorPoint.y);
 }
 
-Button::Button(std::function<void()> onClick, sf::Vector2f lowerAnchorPoint, float width, float height) : 
+Button::Button(const std::function<void()> &onClick, const sf::Vector2f& lowerAnchorPoint, float width, float height) : 
 	onClick(onClick), lowerAnchorPoint(lowerAnchorPoint)
 {
 	size = sf::Vector2f(width, height);
