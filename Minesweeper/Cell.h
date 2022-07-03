@@ -12,5 +12,6 @@ struct Cell
 	bool isRevealed;
 	Cell();
 	void setSpriteTexture(const sf::Texture& texture);
+	void resetCell();
 };
 

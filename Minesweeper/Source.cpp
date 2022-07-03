@@ -1,11 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
+#include <Windows.h>
 #include "Game.h"
 #include "CellType.h"
 #include "Grid.h"
 
 int main()
 {
+    FreeConsole();
+    
     std::unordered_map<CellType, sf::Texture> gridTextures;
 
     for (int i = CellType::empty; i <= CellType::bombCross; i++)
@@ -15,9 +18,19 @@ int main()
         gridTextures[static_cast<CellType>(i)] = texture;
     }
     
-    std::unique_ptr<IGameEntity> grid = std::make_unique<Grid>(gridTextures);
-
     Game game;
+    
+    std::unique_ptr<IGameEntity> grid = std::make_unique<Grid>(gridTextures, sf::Vector2f(65.f, 90.f));
+
+    std::unique_ptr<IGameEntity> resetButton = std::make_unique<Button>(
+        std::bind(&Grid::resetGrid, static_cast<Grid*>(grid.get())),
+        sf::Vector2f(242.f, 30.f),
+        32.f,
+        32.f
+    );
+
+    game.attachEntity(resetButton);
+
     game.attachEntity(grid);
 
     while (game.isRunning())

@@ -3,6 +3,7 @@
 #include "IGameEntity.h"
 #include "Cell.h"
 #include "Constants.h"
+#include "Button.h"
 #include <random>
 #include <unordered_map>
 
@@ -27,14 +28,15 @@ private:
 	void toggleBanner();
 	void handleGameLost();
 	void handleGameWon();
-	void applyTexture(Cell& cell);
+	void resetCells();
+	void applyTextureToCell(CellType cellTexture, Cell& cell);
 	void propagateReveal(int col, int row);
 	sf::Vector2i calcGridPosition();
 	bool mouseInsideGrid();
 	bool isValidGridCell(int col, int row);
 
 public:
-	Grid(std::unordered_map<CellType, sf::Texture>& gridTextures);
+	Grid(std::unordered_map<CellType, sf::Texture>& gridTextures, sf::Vector2f lowerAnchorPoint);
 	void resetGrid();
 	void handleEvent(sf::Event& event);
 	void draw(std::unique_ptr<sf::RenderWindow>& window);
