@@ -13,9 +13,12 @@ void Grid::initCellTextures()
 	lowerAnchorPoint.x = 65.f;
 	lowerAnchorPoint.y = 65.f;
 
-	for (int i = 0; i < MAX_GRID_ROWS; i++)
+	upperAnchorPoint.x = lowerAnchorPoint.x + static_cast<float>(CELL_SIZE * MAX_GRID_COLLUMS);
+	upperAnchorPoint.y = lowerAnchorPoint.y + static_cast<float>(CELL_SIZE * MAX_GRID_ROWS);
+
+	for (int i = 0; i < MAX_GRID_COLLUMS; i++)
 	{
-		for (int j = 0; j < MAX_GRID_COLLUMS; j++)
+		for (int j = 0; j < MAX_GRID_ROWS; j++)
 		{
 			sf::Vector2f pos(lowerAnchorPoint.x + static_cast<float>(CELL_SIZE * i), lowerAnchorPoint.y + static_cast<float>(CELL_SIZE * j));
 			grid[i][j].sprite.setPosition(pos);
@@ -29,16 +32,16 @@ void Grid::setBombsCoordinates()
 {
 	std::random_device device;
 	std::mt19937 rng(device());
-	std::vector<int> bombs(MAX_GRID_COLLUMS * MAX_GRID_ROWS);
+	std::vector<int> bombs(MAX_GRID_ROWS * MAX_GRID_COLLUMS);
 	std::fill(bombs.begin(), bombs.begin() + BOMBS_AMOUNT, 1);
 
 	std::shuffle(bombs.begin(), bombs.end(), rng);
 
 	int index = 0;
 
-	for (int i = 0; i < MAX_GRID_ROWS; i++)
+	for (int i = 0; i < MAX_GRID_COLLUMS; i++)
 	{
-		for (int j = 0; j < MAX_GRID_COLLUMS; j++)
+		for (int j = 0; j < MAX_GRID_ROWS; j++)
 		{
 			if (bombs[index++] != 0)
 				grid[i][j].cellState = CellType::bomb;
@@ -48,9 +51,9 @@ void Grid::setBombsCoordinates()
 
 void Grid::setSurroudingBombs()
 {
-	for (int i = 0; i < MAX_GRID_ROWS; i++)
+	for (int i = 0; i < MAX_GRID_COLLUMS; i++)
 	{
-		for (int j = 0; j < MAX_GRID_COLLUMS; j++)
+		for (int j = 0; j < MAX_GRID_ROWS; j++)
 		{
 			if (grid[i][j].cellState == CellType::bomb) continue;
 			
@@ -58,7 +61,8 @@ void Grid::setSurroudingBombs()
 
 			for (auto& dir : directions)
 			{
-				surroundingBombs += grid[i + dir.x][j + dir.y].cellState == CellType::bomb;
+				if (isValidGridCell(i + dir.x, j + dir.y))
+					surroundingBombs += grid[i + dir.x][j + dir.y].cellState == CellType::bomb;
 			}
 
 			grid[i][j].cellState = static_cast<CellType>(surroundingBombs);
@@ -68,7 +72,21 @@ void Grid::setSurroudingBombs()
 	}
 }
 
+void Grid::revealCell()
+{
+}
 
+void Grid::placeBanner()
+{
+}
+
+sf::Vector2i Grid::calcGridPosition()
+{
+	const float cellSize = static_cast<float>(CELL_SIZE);
+	const int rowPosition = static_cast<int>(floor((mousePosition.x - lowerAnchorPoint.x) / cellSize));
+	const int colPosition = static_cast<int>(floor((mousePosition.y - lowerAnchorPoint.y) / cellSize));
+	return sf::Vector2i(rowPosition, colPosition);
+}
 
 void Grid::initCellStates()
 {
@@ -77,36 +95,45 @@ void Grid::initCellStates()
 	setSurroudingBombs();
 }
 
-bool Grid::insideGrid(int x, int y)
+bool Grid::mouseInsideGrid()
 {
-	//float fx = static_cast<float>(x);
-	//float fy = static_cast<float>(y);
+	return (mousePosition.x >= lowerAnchorPoint.x && mousePosition.y >= lowerAnchorPoint.y &&
+			mousePosition.x <= upperAnchorPoint.x && mousePosition.y <= upperAnchorPoint.y);
+}
+
+bool Grid::isValidGridCell(int col, int row)
+{
+	return (col >= 0 && col < MAX_GRID_COLLUMS && row >= 0 && row < MAX_GRID_ROWS);
 }
 
 void Grid::handleEvent(sf::Event& event)
 {
-	
-	//if (event.type == sf::Event::MouseButtonPressed)
-	//{
-	//	std::cout << event.mouseButton.button << " !!!\n";
-	//	std::cout << event.mouseButton.x << " " << event.mouseButton.y << " !!!\n";
-	//	if (insideGrid(x, y))
-	//		return;
+	if (event.type == sf::Event::MouseButtonPressed)
+	{
+		mousePosition = sf::Vector2f(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y));
 
-	//	//if (event.mouseButton.button == sf::Mouse::Button::Left)
-	//		//revealCell();
+		std::cout << mousePosition.x << " " << mousePosition.y << " Mouse pos\n";
+		
+		if (!mouseInsideGrid())
+			return;
 
-	//	//if (event.mouseButton.button == sf::Mouse::Button::Left)
-	//		//placeBanner();
-	//	
-	//}
+		gridPosition = calcGridPosition();
+
+		std::cout << gridPosition.x << " " << gridPosition.y << " Grid pos\n";
+		
+		if (event.mouseButton.button == sf::Mouse::Button::Left)
+			revealCell();
+
+		if (event.mouseButton.button == sf::Mouse::Button::Right)
+			placeBanner();
+	}
 }
 
 void Grid::draw(std::unique_ptr<sf::RenderWindow>& window)
 {
-	for (int i = 0; i < MAX_GRID_ROWS; i++)
+	for (int i = 0; i < MAX_GRID_COLLUMS; i++)
 	{
-		for (int j = 0; j < MAX_GRID_COLLUMS; j++)
+		for (int j = 0; j < MAX_GRID_ROWS; j++)
 		{
 			window->draw(grid[i][j].sprite);
 		}

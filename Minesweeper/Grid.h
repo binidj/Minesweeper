@@ -11,13 +11,19 @@ class Grid : public IGameEntity
 private:
 	sf::Vector2f lowerAnchorPoint;
 	sf::Vector2f upperAnchorPoint;
-	Cell grid[MAX_GRID_ROWS][MAX_GRID_COLLUMS];
+	sf::Vector2f mousePosition;
+	sf::Vector2i gridPosition;
+	Cell grid[MAX_GRID_COLLUMS][MAX_GRID_ROWS];
 	std::unordered_map<CellType, sf::Texture> &gridTextures;
 	void initCellTextures();
 	void setBombsCoordinates();
 	void initCellStates();
 	void setSurroudingBombs();
-	bool insideGrid(int x, int y);
+	void revealCell();
+	void placeBanner();
+	sf::Vector2i calcGridPosition();
+	bool mouseInsideGrid();
+	bool isValidGridCell(int col, int row);
 public:
 	Grid(std::unordered_map<CellType, sf::Texture>& gridTextures);
 	void handleEvent(sf::Event& event);
